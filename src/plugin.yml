@@ -1,0 +1,20 @@
+name: BlockRandomizer
+main: dygoat.blockrandomizer.BlockRandomizer
+version: 1.0
+api-version: 1.17
+author: Dygo454
+website: https://www.twitch.tv/dygo454
+
+commands:
+  start:
+    description: Starts block randomization.
+    usage: '/start'
+
+permissions:
+  BlockRandomizer.*:
+    description: Permissions for block randomizer commands.
+    children:
+      BlockRandomizer.start: true
+  BlockRandomizer.start:
+    description: Starts block randomizer challenge.
+    default: op
