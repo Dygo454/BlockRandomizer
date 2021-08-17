@@ -1,11 +1,11 @@
 package dygoat.blockrandomizer;
 
 import org.bukkit.*;
+import org.bukkit.block.Chest;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.loot.LootTable;
 import org.bukkit.loot.LootTables;
-import org.bukkit.loot.Lootable;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitScheduler;
 
@@ -24,28 +24,28 @@ public class BlockRandomizer extends JavaPlugin {
 
     static {
         loots = new ArrayList<>();
-        loots.add(Bukkit.getLootTable(LootTables.ABANDONED_MINESHAFT.getKey()));
-        loots.add(Bukkit.getLootTable(LootTables.BASTION_BRIDGE.getKey()));
-        loots.add(Bukkit.getLootTable(LootTables.BASTION_HOGLIN_STABLE.getKey()));
-        loots.add(Bukkit.getLootTable(LootTables.BASTION_OTHER.getKey()));
-        loots.add(Bukkit.getLootTable(LootTables.BASTION_TREASURE.getKey()));
-        loots.add(Bukkit.getLootTable(LootTables.BURIED_TREASURE.getKey()));
-        loots.add(Bukkit.getLootTable(LootTables.DESERT_PYRAMID.getKey()));
-        loots.add(Bukkit.getLootTable(LootTables.END_CITY_TREASURE.getKey()));
-        loots.add(Bukkit.getLootTable(LootTables.WOODLAND_MANSION.getKey()));
-        loots.add(Bukkit.getLootTable(LootTables.IGLOO_CHEST.getKey()));
-        loots.add(Bukkit.getLootTable(LootTables.JUNGLE_TEMPLE.getKey()));
-        loots.add(Bukkit.getLootTable(LootTables.NETHER_BRIDGE.getKey()));
-        loots.add(Bukkit.getLootTable(LootTables.PILLAGER_OUTPOST.getKey()));
-        loots.add(Bukkit.getLootTable(LootTables.RUINED_PORTAL.getKey()));
-        loots.add(Bukkit.getLootTable(LootTables.SHIPWRECK_SUPPLY.getKey()));
-        loots.add(Bukkit.getLootTable(LootTables.SHIPWRECK_TREASURE.getKey()));
-        loots.add(Bukkit.getLootTable(LootTables.SPAWN_BONUS_CHEST.getKey()));
-        loots.add(Bukkit.getLootTable(LootTables.STRONGHOLD_CORRIDOR.getKey()));
-        loots.add(Bukkit.getLootTable(LootTables.STRONGHOLD_CROSSING.getKey()));
-        loots.add(Bukkit.getLootTable(LootTables.STRONGHOLD_LIBRARY.getKey()));
-        loots.add(Bukkit.getLootTable(LootTables.SIMPLE_DUNGEON.getKey()));
-        loots.add(Bukkit.getLootTable(LootTables.VILLAGE_WEAPONSMITH.getKey()));
+        loots.add(LootTables.ABANDONED_MINESHAFT.getLootTable());
+        loots.add(LootTables.BASTION_BRIDGE.getLootTable());
+        loots.add(LootTables.BASTION_HOGLIN_STABLE.getLootTable());
+        loots.add(LootTables.BASTION_OTHER.getLootTable());
+        loots.add(LootTables.BASTION_TREASURE.getLootTable());
+        loots.add(LootTables.BURIED_TREASURE.getLootTable());
+        loots.add(LootTables.DESERT_PYRAMID.getLootTable());
+        loots.add(LootTables.END_CITY_TREASURE.getLootTable());
+        loots.add(LootTables.WOODLAND_MANSION.getLootTable());
+        loots.add(LootTables.IGLOO_CHEST.getLootTable());
+        loots.add(LootTables.JUNGLE_TEMPLE.getLootTable());
+        loots.add(LootTables.NETHER_BRIDGE.getLootTable());
+        loots.add(LootTables.PILLAGER_OUTPOST.getLootTable());
+        loots.add(LootTables.RUINED_PORTAL.getLootTable());
+        loots.add(LootTables.SHIPWRECK_SUPPLY.getLootTable());
+        loots.add(LootTables.SHIPWRECK_TREASURE.getLootTable());
+        loots.add(LootTables.SPAWN_BONUS_CHEST.getLootTable());
+        loots.add(LootTables.STRONGHOLD_CORRIDOR.getLootTable());
+        loots.add(LootTables.STRONGHOLD_CROSSING.getLootTable());
+        loots.add(LootTables.STRONGHOLD_LIBRARY.getLootTable());
+        loots.add(LootTables.SIMPLE_DUNGEON.getLootTable());
+        loots.add(LootTables.VILLAGE_WEAPONSMITH.getLootTable());
         ms = new ArrayList<>();
         ms.add(Material.STONE);
         ms.add(Material.GRASS_BLOCK);
@@ -137,6 +137,9 @@ public class BlockRandomizer extends JavaPlugin {
         ms.add(Material.BEDROCK);
         ms.add(Material.NETHERRACK);
         ms.add(Material.SOUL_SAND);
+        ms.add(Material.SOUL_SOIL);
+        ms.add(Material.SOUL_FIRE);
+        ms.add(Material.SOUL_SAND);
         ms.add(Material.GLOWSTONE);
         ms.add(Material.NETHER_GOLD_ORE);
         ms.add(Material.NETHER_QUARTZ_ORE);
@@ -209,19 +212,37 @@ public class BlockRandomizer extends JavaPlugin {
     }
 
     public void doRandomizer() {
-        Material toReplace = null;
-        Material toPlace = null;
+        Material toReplace = Material.GRASS;
+        Material toPlace = Material.CHEST;
         while (toReplace == null || toReplace.isAir() || !toReplace.isBlock()) {
             int num = (int) (Math.random() * ms.size());
             toReplace = ms.get(num);
         }
-        while (toPlace == null || toPlace.isAir() || !toPlace.isBlock()) {
+        boolean chestCheck = true;
+        while (toPlace == null || toPlace.isAir() || !toPlace.isBlock() || !chestCheck) {
+            chestCheck = true;
             int num = (int) (Math.random() * ms.size());
             toPlace = ms.get(num);
+            if (toPlace == Material.CHEST) {
+                switch (toReplace) {
+                    case GRASS_BLOCK:
+                    case DIRT:
+                    case STONE:
+                    case NETHERRACK:
+                    case WATER:
+                    case LAVA:
+                    case SOUL_SAND:
+                    case SOUL_SOIL:
+                    case SAND:
+                    case SANDSTONE:
+                        chestCheck = false;
+                }
+            }
         }
         Bukkit.broadcastMessage("Now replacing "+toReplace.name()+" with "+toPlace.name()+"!");
         replaced.add(toReplace);
         placed.add(toPlace);
+        int count = 0;
         for (World w : Bukkit.getServer().getWorlds()) {
             for (Chunk c : w.getLoadedChunks()) {
                 for (int x = 0; x < 16; x++) {
@@ -230,7 +251,9 @@ public class BlockRandomizer extends JavaPlugin {
                             if (c.getBlock(x,y,z).getBlockData().getMaterial().equals(toReplace)) {
                                 c.getBlock(x,y,z).setType(toPlace,false);
                                 if (toPlace == Material.CHEST) {
-                                    ((Lootable) c.getBlock(x, y, z).getBlockData()).setLootTable(loots.get((int) (Math.random()*22)));
+                                    Chest chest = (Chest)c.getBlock(x,y,z).getState();
+                                    chest.setLootTable(loots.get((int) (Math.random()*22)));
+                                    chest.update();
                                 }
                             }
                         }
@@ -250,7 +273,12 @@ public class BlockRandomizer extends JavaPlugin {
                         if (c.getBlock(x, y, z).getBlockData().getMaterial().equals(replaced.get(i))) {
                             c.getBlock(x, y, z).setType(placed.get(i),false);
                             if (placed.get(i) == Material.CHEST) {
-                                ((Lootable) c.getBlock(x, y, z).getBlockData()).setLootTable(loots.get((int) (Math.random()*22)));
+                                c.getBlock(x,y,z).setType(placed.get(i),false);
+                                if (placed.get(i) == Material.CHEST) {
+                                    Chest chest = (Chest)c.getBlock(x,y,z).getState();
+                                    chest.setLootTable(loots.get((int) (Math.random()*22)));
+                                    chest.update();
+                                }
                             }
                         }
                     }
