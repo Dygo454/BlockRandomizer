@@ -229,6 +229,9 @@ public class BlockRandomizer extends JavaPlugin {
                         for (int y = w.getMinHeight(); y < w.getMaxHeight(); y++) {
                             if (c.getBlock(x,y,z).getBlockData().getMaterial().equals(toReplace)) {
                                 c.getBlock(x,y,z).setType(toPlace,false);
+                                if (toPlace == Material.CHEST) {
+                                    ((Lootable) c.getBlock(x, y, z).getBlockData()).setLootTable(loots.get((int) (Math.random()*22)));
+                                }
                             }
                         }
                     }
